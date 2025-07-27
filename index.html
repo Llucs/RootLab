@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RootLab</title>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --fg: #fff;
+    --accent: #00ff88;
+    --card-bg: #1a1a1a;
+    --text-muted: #888;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg);
+    color: var(--fg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    text-align: center;
+    padding: 3rem 1rem 1.5rem;
+  }
+  header h1 {
+    font-size: 3rem;
+    color: var(--accent);
+    letter-spacing: -1px;
+  }
+  header p {
+    margin-top: 0.5rem;
+    color: var(--text-muted);
+    font-size: 1rem;
+  }
+  main {
+    flex: 1;
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .mods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid #222;
+    padding: 1.5rem;
+    border-radius: 16px;
+    transition: 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+  }
+  .card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+  }
+  .card p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    flex-grow: 1;
+  }
+  .btn-download {
+    margin-top: 1rem;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    transition: background 0.3s ease;
+  }
+  .btn-download:hover {
+    background: #00cc6a;
+  }
+  footer {
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.85rem;
+    background-color: #111;
+    color: var(--text-muted);
+    border-top: 1px solid #222;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>RootLab</h1>
+  <p>Laboratório de Módulos Magisk</p>
+</header>
+
+<main>
+  <section class="mods" id="mod-list"></section>
+  <p class="empty-msg" id="empty-msg" style="text-align:center; color:var(--text-muted); margin-top: 2rem;">
+    Carregando módulos...
+  </p>
+</main>
+
+<footer>
+  © 2025 RootLab – Todos os direitos reservados
+</footer>
+
+<script>
+  const username = 'SEU_USUARIO_GITHUB'; // troque para seu usuário GitHub
+  const repo = 'RootLab';
+  const branch = 'main';
+
+  const modList = document.getElementById('mod-list');
+  const emptyMsg = document.getElementById('empty-msg');
+
+  async function fetchMods() {
+    try {
+      const url = `https://api.github.com/repos/${username}/${repo}/contents/mods?ref=${branch}`;
+      const response = await fetch(url);
+      const items = await response.json();
+
+      if (!Array.isArray(items)) {
+        emptyMsg.textContent = 'Erro ao carregar módulos.';
+        return;
+      }
+
+      if (items.length === 0) {
+        emptyMsg.textContent = 'Nenhum módulo disponível.';
+        return;
+      }
+
+      emptyMsg.style.display = 'none';
+
+      for (const item of items) {
+        if (item.type === 'dir') {
+          const infoUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/mods/${item.name}/info.json`;
+          try {
+            const infoResp = await fetch(infoUrl);
+            if (!infoResp.ok) continue;
+            const info = await infoResp.json();
+
+            const card = criarCardMod(info, item.name);
+            modList.appendChild(card);
+          } catch(e) {
+            console.warn('Erro ao carregar info.json de', item.name, e);
+          }
+        }
+      }
+    } catch (error) {
+      emptyMsg.textContent = 'Falha ao acessar API do GitHub.';
+      console.error(error);
+    }
+  }
+
+  function criarCardMod(mod, id) {
+    const card = document.createElement('article');
+    card.className = 'card';
+
+    const titulo = document.createElement('h3');
+    titulo.textContent = `${mod.nome} ${mod.versao}`;
+
+    const desc = document.createElement('p');
+    desc.textContent = mod.descricao;
+
+    const linkDetalhes = document.createElement('a');
+    linkDetalhes.textContent = 'Ver detalhes';
+    linkDetalhes.href = `mod.html?mod=${id}`;
+    linkDetalhes.className = 'btn-download';
+    linkDetalhes.style.marginTop = '0.5rem';
+
+    card.appendChild(titulo);
+    card.appendChild(desc);
+    card.appendChild(linkDetalhes);
+
+    return card;
+  }
+
+  fetchMods();
+</script>
+</body>
+</html>
