@@ -1,9 +1,12 @@
 {
-  "id": "speedcool",
   "name": "SpeedCool",
   "version": "2.1",
-  "description": "Módulo Magisk para controle térmico e desempenho avançado.",
-  "author": "Leandro Lucas",
+  "versionCode": 13,
+  "author": "Llucs",
+  "description": "Gerencia resfriamento inteligente, melhora desempenho e evita superaquecimento.",
   "banner": "https://raw.githubusercontent.com/Llucs/RootLab/main/Speedcool/banner.png",
-  "download": "https://raw.githubusercontent.com/Llucs/RootLab/main/Speedcool/module.zip"
+  "icon": "https://raw.githubusercontent.com/Llucs/RootLab/main/Speedcool/icon.png",
+  "download": "https://raw.githubusercontent.com/Llucs/RootLab/main/Speedcool/SpeedCool-v2.3.zip",
+  "changelog": "Melhorias na compatibilidade, correções de bugs críticos e fallback seguro implementado.",
+  "id": "speedcool"
 }
