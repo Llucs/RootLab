@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RootLab - Detalhes do Módulo</title>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --fg: #fff;
+    --accent: #00ff88;
+    --card-bg: #1a1a1a;
+    --text-muted: #888;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg);
+    color: var(--fg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+  header h1 {
+    font-size: 2.5rem;
+    color: var(--accent);
+  }
+  main {
+    flex: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem 3rem;
+  }
+  .banner {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 16px;
+    margin-bottom: 1rem;
+    background: #222;
+  }
+  h2 {
+    margin-bottom: 0.5rem;
+    color: var(--accent);
+  }
+  p {
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+  .tags {
+    margin-bottom: 1.5rem;
+  }
+  .tag {
+    display: inline-block;
+    background: var(--card-bg);
+    color: var(--text-muted);
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    margin-right: 0.5rem;
+  }
+  .btn-download {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 0.8rem 1.4rem;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.3s ease;
+  }
+  .btn-download:hover {
+    background: #00cc6a;
+  }
+  .back-link {
+    display: inline-block;
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  .back-link:hover {
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>RootLab</h1>
+</header>
+<main>
+  <a href="index.html" class="back-link">← Voltar para a lista</a>
+  <div id="mod-details">
+    <p>Carregando módulo...</p>
+  </div>
+</main>
+<script>
+  const username = 'SEU_USUARIO_GITHUB'; // coloque seu usuário GitHub aqui
+  const repo = 'RootLab';
+  const branch = 'main';
+
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
+  async function carregarModulo(modId) {
+    const infoUrl = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/mods/${modId}/info.json`;
+    try {
+      const resp = await fetch(infoUrl);
+      if (!resp.ok) throw new Error('Módulo não encontrado');
+      const mod = await resp.json();
+
+      const container = document.getElementById('mod-details');
+      container.innerHTML = '';
+
+      if(mod.banner){
+        const banner = document.createElement('img');
+        banner.src = `https://raw.githubusercontent.com/${username}/${repo}/${branch}/mods/${modId}/${mod.banner}`;
+        banner.alt = mod.nome + ' banner';
+        banner.className = 'banner';
+        container.appendChild(banner);
+      }
+
+      const titulo = document.createElement('h2');
+      titulo.textContent = `${mod.nome} ${mod.versao}`;
+      container.appendChild(titulo);
+
+      const desc = document.createElement('p');
+      desc.textContent = mod.descricao;
+      container.appendChild(desc);
+
+      if(mod.tags && mod.tags.length > 0){
+        const tagsDiv = document.createElement('div');
+        tagsDiv.className = 'tags';
+        mod.tags.forEach(tag => {
+          const tagSpan = document.createElement('span');
+          tagSpan.className = 'tag';
+          tagSpan.textContent = tag;
+          tagsDiv.appendChild(tagSpan);
+        });
+        container.appendChild(tagsDiv);
+      }
+
+      const btn = document.createElement('a');
+      btn.className = 'btn-download';
+      btn.href = `https://github.com/${username}/${repo}/raw/${branch}/mods/${modId}/${mod.arquivo}`;
+      btn.target = '_blank';
+      btn.rel = 'noopener noreferrer';
+      btn.textContent = 'Baixar módulo';
+      container.appendChild(btn);
+
+    } catch (e) {
+      document.getElementById('mod-details').textContent = 'Erro ao carregar o módulo.';
+      console.error(e);
+    }
+  }
+
+  const modId = getQueryParam('mod');
+  if(modId){
+    carregarModulo(modId);
+  } else {
+    document.getElementById('mod-details').textContent = '
