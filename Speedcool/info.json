@@ -1,0 +1,9 @@
+{
+  "id": "speedcool",
+  "name": "SpeedCool",
+  "version": "2.1",
+  "description": "Módulo Magisk para controle térmico e desempenho avançado.",
+  "author": "Leandro Lucas",
+  "banner": "https://raw.githubusercontent.com/Llucs/RootLab/main/Speedcool/banner.png",
+  "download": "https://raw.githubusercontent.com/Llucs/RootLab/main/Speedcool/module.zip"
+}
